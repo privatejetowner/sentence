@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>第一组</title>
+    <title>test</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .card-container {
@@ -57,31 +57,33 @@
         }
         
         .modal-content {
-            background-color: white;
-            margin: 10% auto;
+            background-color: #CEAB93;
+            margin: 30% auto;
             padding: 20px;
             border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 70vh;
+            width: 85%;
+            max-width: 350px;
+            max-height: 50vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            color: #FFFBE9;
         }
         
         .close {
-            color: #aaa;
+            color: #FFFBE9;
             float: right;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             cursor: pointer;
             position: absolute;
             right: 15px;
             top: 10px;
+            opacity: 0.8;
         }
         
         .close:hover {
-            color: #000;
+            opacity: 1;
         }
         
         .divider {
@@ -101,9 +103,9 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4">
+<body style="background-color: #E3CAA5;" class="min-h-screen p-4">
     <div class="max-w-4xl mx-auto px-4">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-8">卡片展示</h1>
+        <h1 class="text-2xl font-bold text-center mb-8" style="color: #AD8B73;">test</h1>
         <div id="cards-container" class="grid grid-cols-2 gap-6">
             <!-- 卡片将通过 JavaScript 动态生成 -->
         </div>
@@ -113,7 +115,7 @@
     <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <div id="modal-text" class="text-gray-800 leading-relaxed"></div>
+            <div id="modal-text" class="leading-relaxed pt-6"></div>
         </div>
     </div>
 
@@ -121,7 +123,7 @@
         // 数据
         const data = [
             {
-                "sentence": "我会守护你。",
+                "sentence": "啦啦啦",
                 "cp": "张三×李四",
                 "time": "2025年七月",
                 "background": "这是一次约定的重逢。",
@@ -146,10 +148,10 @@
         }
 
         // 显示模态框
-        function showModal(content) {
+        function showModal(title, content) {
             const modal = document.getElementById('modal');
             const modalText = document.getElementById('modal-text');
-            modalText.innerHTML = content;
+            modalText.innerHTML = `<h3 class="font-semibold mb-3 text-lg">${title}</h3><p class="text-base">${content}</p>`;
             modal.style.display = 'block';
         }
 
@@ -193,12 +195,12 @@
 
             // 添加 background（如果存在）
             if (item.background && item.background.trim()) {
-                const truncatedBg = truncateText(item.background, 20);
-                const needsTruncation = item.background.length > 20;
+                const truncatedBg = truncateText(item.background, 1);
+                const needsTruncation = item.background.length > 1;
                 backContent += `
                     <p class="mb-2 opacity-90">
                         <span class="${needsTruncation ? 'clickable-text' : ''}" 
-                              ${needsTruncation ? `onclick="showModal('${item.background.replace(/'/g, '&#39;')}')"` : ''}>
+                              ${needsTruncation ? `onclick="showModal('背景故事', '${item.background.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')"` : ''}>
                             ${truncatedBg}
                         </span>
                     </p>
@@ -209,12 +211,12 @@
             if (item.statements && item.statements.length > 0) {
                 backContent += '<div class="mt-2">';
                 item.statements.forEach((statement, idx) => {
-                    const truncatedStatement = truncateText(statement, 15);
-                    const needsTruncation = statement.length > 15;
+                    const truncatedStatement = truncateText(statement, 1);
+                    const needsTruncation = statement.length > 1;
                     backContent += `
                         <p class="mb-1 text-xs opacity-90">
                             <span class="${needsTruncation ? 'clickable-text' : ''}"
-                                  ${needsTruncation ? `onclick="showModal('${statement.replace(/'/g, '&#39;')}')"` : ''}>
+                                  ${needsTruncation ? `onclick="showModal('声明 ${idx + 1}', '${statement.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')"` : ''}>
                                 ${truncatedStatement}
                             </span>
                         </p>
