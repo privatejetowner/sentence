@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第一组</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            perspective: 1000px;
+            height: 200px;
+            width: 100%;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-front {
+            background: #AD8B73;
+            color: #FFFBE9;
+        }
+        
+        .card-back {
+            background: #AD8B73;
+            color: #FFFBE9;
+            transform: rotateY(180deg);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 70vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255, 251, 233, 0.3);
+            margin: 12px 0;
+        }
+        
+        .clickable-text {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 251, 233, 0.6);
+        }
+        
+        .clickable-text:hover {
+            text-decoration-color: #FFFBE9;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-8">卡片展示</h1>
+        <div id="cards-container" class="grid grid-cols-2 gap-6">
+            <!-- 卡片将通过 JavaScript 动态生成 -->
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-text" class="text-gray-800 leading-relaxed"></div>
+        </div>
+    </div>
+
+    <script>
+        // 数据
+        const data = [
+            {
+                "sentence": "我会守护你。",
+                "cp": "张三×李四",
+                "time": "2025年七月",
+                "background": "这是一次约定的重逢。",
+                "statements": [
+                    "投我一票吧！",
+                    "你支持我就是我的动力！"
+                ]
+            },
+            {
+                "sentence": "遇见你，是我这辈子最幸运的事。",
+                "cp": "王五×赵六",
+                "time": "2024年冬天",
+                "background": "",
+                "statements": []
+            }
+        ];
+
+        // 截断文本函数
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // 显示模态框
+        function showModal(content) {
+            const modal = document.getElementById('modal');
+            const modalText = document.getElementById('modal-text');
+            modalText.innerHTML = content;
+            modal.style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // 创建卡片
+        function createCard(item, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${index}`;
+
+            // 正面
+            const frontFace = document.createElement('div');
+            frontFace.className = 'card-face card-front flex items-center justify-center p-6';
+            frontFace.innerHTML = `
+                <div class="text-center w-full">
+                    <p class="text-lg font-medium leading-relaxed">${item.sentence}</p>
+                </div>
+            `;
+
+            // 反面
+            const backFace = document.createElement('div');
+            backFace.className = 'card-face card-back p-6 flex flex-col justify-between';
+            
+            let backContent = `
+                <div class="text-center mb-3">
+                    <p class="text-base font-medium mb-2">${item.sentence}</p>
+                    <p class="text-sm opacity-90">${item.cp}</p>
+                </div>
+                <div class="divider"></div>
+                <div class="flex-1">
+                    <div class="text-left text-sm">
+                        <p class="mb-2 opacity-80">${item.time}</p>
+            `;
+
+            // 添加 background（如果存在）
+            if (item.background && item.background.trim()) {
+                const truncatedBg = truncateText(item.background, 20);
+                const needsTruncation = item.background.length > 20;
+                backContent += `
+                    <p class="mb-2 opacity-90">
+                        <span class="${needsTruncation ? 'clickable-text' : ''}" 
+                              ${needsTruncation ? `onclick="showModal('${item.background.replace(/'/g, '&#39;')}')"` : ''}>
+                            ${truncatedBg}
+                        </span>
+                    </p>
+                `;
+            }
+
+            // 添加 statements（如果存在）
+            if (item.statements && item.statements.length > 0) {
+                backContent += '<div class="mt-2">';
+                item.statements.forEach((statement, idx) => {
+                    const truncatedStatement = truncateText(statement, 15);
+                    const needsTruncation = statement.length > 15;
+                    backContent += `
+                        <p class="mb-1 text-xs opacity-90">
+                            <span class="${needsTruncation ? 'clickable-text' : ''}"
+                                  ${needsTruncation ? `onclick="showModal('${statement.replace(/'/g, '&#39;')}')"` : ''}>
+                                ${truncatedStatement}
+                            </span>
+                        </p>
+                    `;
+                });
+                backContent += '</div>';
+            }
+
+            backContent += `
+                    </div>
+                </div>
+            `;
+
+            backFace.innerHTML = backContent;
+
+            // 组装卡片
+            card.appendChild(frontFace);
+            card.appendChild(backFace);
+            cardContainer.appendChild(card);
+
+            // 添加点击事件
+            card.addEventListener('click', function(e) {
+                // 阻止点击可点击文本时触发翻转
+                if (e.target.classList.contains('clickable-text')) {
+                    return;
+                }
+                card.classList.toggle('flipped');
+            });
+
+            return cardContainer;
+        }
+
+        // 初始化页面
+        function init() {
+            const container = document.getElementById('cards-container');
+            data.forEach((item, index) => {
+                const card = createCard(item, index);
+                container.appendChild(card);
+            });
+        }
+
+        // 模态框事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            // 关闭模态框事件
+            const modal = document.getElementById('modal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn.onclick = closeModal;
+            
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        });
+    </script>
+</body>
+</html>
