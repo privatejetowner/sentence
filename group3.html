@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第三组</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            perspective: 1000px;
+            height: 280px;
+            width: 100%;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-front {
+            background: #AD8B73;
+            color: #FFFBE9;
+        }
+        
+        .card-back {
+            background: #AD8B73;
+            color: #FFFBE9;
+            transform: rotateY(180deg);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #CEAB93;
+            margin: 30% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 350px;
+            max-height: 50vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            color: #FFFBE9;
+        }
+        
+        .close {
+            color: #FFFBE9;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            opacity: 0.8;
+        }
+        
+        .close:hover {
+            opacity: 1;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255, 251, 233, 0.3);
+            margin: 12px 0;
+        }
+        
+        .clickable-text {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 251, 233, 0.6);
+        }
+        
+        .clickable-text:hover {
+            text-decoration-color: #FFFBE9;
+        }
+    </style>
+</head>
+<body style="background-color: #E3CAA5;" class="min-h-screen p-4">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-2xl font-bold text-center mb-8" style="color: #AD8B73;">第三组</h1>
+        <div id="cards-container" class="grid grid-cols-1 gap-6">
+            <!-- 卡片将通过 JavaScript 动态生成 -->
+        </div>
+        
+        <!-- 返回按钮 -->
+        <div class="mt-8 text-center">
+            <button onclick="window.location.href='index.html'" class="px-6 py-3 rounded-lg font-medium text-lg transition-all duration-300 hover:scale-105 active:scale-95" style="background-color: #AD8B73; color: #FFFBE9; box-shadow: 0 4px 12px rgba(173, 139, 115, 0.3);">
+                返回首页
+            </button>
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-text" class="leading-relaxed pt-6"></div>
+        </div>
+    </div>
+
+    <script>
+        // 数据
+        const data = [
+{
+    "sentence": "1.“最后一名和第一名都是我嘛”",
+    "cp": "壳",
+    "time": "23.8.18",
+    "background": "“叽桑尼心里的可爱第一名当然是我啦”“说你是最后一名啦”“最后一名和第一名都是我嘛”",
+    "statements": []
+},
+{
+    "sentence": "2.“谢谢大家来祝贺叽桑的生日 我替他... 下次见哦~哈哈哈哈”",
+    "cp": "壳",
+    "time": "2.12➕2.20",
+    "background": "牢记生日会，这是一场连续剧，老壳带来的节目是夫妻组合拳。首先老叻的wvs留言确实茶得不太像他平时的风格，也是不怪积木集体高潮。结局只能说明老叻嫂子瘾没牢记姐夫瘾那么严重但也还是有的。附上生日会总结帖链接https://www.douban.com/doubanapp/dispatch?uri=%2Fgroup%2Ftopic%2F319517956%3F_spm_id%3DMjEyMDU2NjU0&_i=537706882212400&dt_dapp=1 原对话：2.12wvs星：我的生日派对 来的人！乐：我可以去吗？ 没有位置了也太过分了呢 大家应该是会想和寄松一起度过生日的去（的话）是不是就有点那什么了 2.20牢记生日会牢记：是陈咯的提案“只要陈咯说了的话 我无条件ok” 老叻：谢谢大家来祝贺叽桑的生日 我替他... 下次见哦~哈哈哈哈",
+    "statements": [
+        "不踩着wf大卖的产品不是好产品。老壳这套夫夫组合拳的爽感已经不用多解释。不管你是科技还是对壳路好，还是路过乐子人，如果你也在2.20热闹非凡的生日会事件中收获了快乐，请给我们这对无法无天的公婆投一票吧！"
+    ]
+},
+{
+    "sentence": "3.“不要放弃我 不然我会受伤的”",
+    "cp": "壳",
+    "time": "21/9/4",
+    "background": "辰志的这个那个第二季一起做春卷篇，原对话“不要放弃我，我会受伤的”“好久没听你说这句话了”",
+    "statements": [
+        "这段话的含金量在于是叻叻说出来的，能让平时傲娇嘴硬的叻带着撒娇语气对叽子说出这句话，可见壳比的感情有多相互信任到能把自己内心最柔软的一面摊开给对方看，而且这句话真的太让人心动了",
+        "12年因为我们都热爱舞台所以在央视相遇，语言没有成为我们的隔阂，却成为我们命运故事中的一环。虽然你我来自不同国家，说着不同的语言，但我们可以一起坐着玩幼稚的手指游戏，命运一般我们的iPad几乎一模一样。“阿nia哈赛呦”这个穿着红色衣服有点像小鸡仔一样的小男孩，正在教我人生中的第一句韩语。“啊我还能遇到当时那个韩国朋友吗”仁川机场人山人海，周围刺耳的韩语像潮水一样向我涌来，我磕磕绊绊只能说出那句当时你教给我的“阿nia哈赛呦”，心里开始想我还会遇到当时那个教我这句话的你吗。“呀 我觉得你真的非常太帅了”“谢谢”刚开始我的练习生活，这个韩国人很主动的找我搭话，展示着他的中文。说实话说的还可以？不会韩语的我也憨憨笑着。“You are my destiny～”原来叽桑就是当初那个教我韩语的小子啊，下飞机的念叨竟然成真了，我们竟然真的又相遇了，不可思议。“各位各位，我和辰乐哥决定成为亲故了”“阿拉嗖”我告诉叽桑可以不用叫我哥哥的，叽桑说我是他的第一个朋友😏，你也是我的第一个韩国朋友啊叽桑。“我现在想想 他完全不是一个有耐心的人 但他竟然有耐心和我去说明”叽桑教我韩语的时候很耐心 会纠正我语法用词的错误 也会告诉我不好的话不要学。“最喜欢的韩文单词：지성”这个问题出来的时候叽桑在我旁边说了一句叽桑，虽然很想逗他 但确实是叽桑呢 还是不逗他了。是叽桑我的韩文变得好了，是叽桑一直陪着我玩闹，是叽桑一直陪我聊天。我想最喜欢的韩文单词肯定是지성！“不要放弃我 我会受伤的”“好久没听你说这句话了”会在什么处境下说出这句话呢，可能是在韩语课上因为老师的批评而受挫的我，想要学好韩语经常和你聊天，所以希望你不要放弃我。也可能是看着镜子里像机器一样跳着舞的我，和旁边把动作拆解开嘴里喊着one two three four 教我动作，不要放弃我吧叽桑。2012-2025，从北京到首尔的命运故事还在继续书写。你妈妈上次告诉我“我们辰乐韩语说的比叽桑还好了呢”happy happy happy～还好当时你没放弃我 呀 帕鸡桑 以后有不会的韩国语来请教请教我吧😏"
+    ]
+},
+{
+    "sentence": "4.“各位 我们jeno在这么繁忙的行程中 就这样piu的一下去了米兰之后 请一定要多 给点好吃的 如果能给舒适的酒店 给穿上漂亮衣服 我也会非常感谢的”",
+    "cp": "笃",
+    "time": "240222 3j直播",
+    "background": "jeno要去米兰时装周前jaemin说的一段话",
+    "statements": [
+        "帝努记得带上小书包 还有水壶妈妈给你装了热水 有点重自己要拿好别乱晃等会掉了砸到脚很痛的 妈妈已经和老师说了热水要把盖子打开晾一会 你先不要自己打开喝知道吗？很烫的 实在口渴的话和老师说 让老师用小盖子给你接温水喝 记得不要喝凉水 在学校要听老师的话 不要太调皮了 也不要到处乱跑 小心摔倒 幼儿园那么多小朋友如果和别人产生矛盾一定要记得和老师说 有什么不舒服的地方也一定要第一时间和老师说  要多吃点饭 妈妈知道你挑食 如果有什么不想吃的要和老师说 不能扔到地上  出汗了记得和老师说 让老师帮你换一下书包里的汗巾 你放学妈妈就来接你 给你带好吃的 在幼儿园要和其他小朋友友好相处 拜拜宝贝原来螺螺是闭幕"
+    ]
+},
+{
+    "sentence": "5.“我们有属于我们自己的世界”",
+    "cp": "笃",
+    "time": "200622 Arena 杂志采访",
+    "background": "问题问10多岁出道现在才20岁感觉长大了吗？诺回答单独提到了娜说：和jaemin认识了七八年好像有点腻了哈哈哈。买东西都会一起买，我们有属于我们自己的世界。",
+    "statements": [
+        "即使长大之后在镜头面前维持着距离感，嘴上说着腻了，看起来似乎不比小时候熟稔，但真正的答案已公布在未宣泄的空白里，凑在一起叽里咕噜的说话、behind里被staff挡住的搂抱、待机室角落里寸步不离的黏着……青梅竹马长大可能就是这样，在练习生时期的亲密关系驯养中，宿敌和挚友的界限被汗水和镜面模糊成了渐变色，即使是性格不相配的两个人，却把照顾对方腌渍成了肌肉记忆，同龄人还在处理竞争的激烈时，老笃早已将较劲写成依存，两颗激烈的心跳下“不能没有你”和“不能输给你”达成了奇妙的和解，在竞争与偏爱的夹缝中，学会用“我们”这个词造句。疼痛塑造行为，行为驯化习惯，就这样年复一年中，最终连畸形都像是另一种天作之合。由亲密与距离驯化出来的感情，比他们自己内心更知道李帝努与罗渽民的边界线在哪里。这是独属于罗渽民李帝努自己的秘密天地……"
+    ]
+},
+{
+    "sentence": "6.“我人生中的第一句韩语是我旁边这个人教的”",
+    "cp": "壳",
+    "time": "或许是2018.11.20",
+    "background": "出自虎牙双人直播",
+    "statements": [
+        "提到壳永远离不开的就是缘分二字，央视初见到练习室再见，这就是安坏关系的魅力吧。如果我能穿越时空，很想告诉两小比，你身边这个人几年后还会见面，并且你们会成为很好的亲故，想到那个表情一定很可爱。“我和js说了很多话，真的是说个不停，所以才记住了很多单词。”“js 从我会一点点韩语的时候就一直用韩语跟我说话，逐渐得的韩语提高了，所以现在我的语气和 js 很相似。”在我看来教韩语，包括教舞蹈（很多练习室都能看出两人有共同的发力点以及小动作）有点像烙印，或者称呼为关键行为阶段。缘分其实也是很薄弱的东西，彼此的性情、相遇时各自的人生阶段、各自本能的关系模式，已经决定了百分之九十的内容。但小壳从小长大走没有走散是两个人都在努力走向对方，不想放弃对方。稀里糊涂扯了一堆，总而言之请投我们小壳一票吧！"
+    ]
+},
+{
+    "sentence": "7.“我相信人这一生中有三次机会 非常确定的是我遇到了mk哥 在我人生中是一大转折点 然后 我能确定的是在三次机会中 有一次是跟哥一起度过的”",
+    "cp": "传",
+    "time": "23.1",
+    "background": "联联给托托留言",
+    "statements": [
+        "一开始觉得这句子没头没尾，机会为什么会用“度过”？机会是指转折点吗？后来忽然意识到，不管是什么事情，人生里三次你算一次这句话就是把对方放在非常非常重的地位上了。这段长文字的结尾是“我们以后也要一直到达我们所希望的尽头 希望以后能一边笑着一边聊这些事情”这个尽头听着真的很像txl白头偕老回头看自己当时在压抑的环境下是如何维持爱意的，别的不多说了第一句隐晦表白最后一句老托挑个假期把人带回多伦多结个婚吧"
+    ]
+},
+{
+    "sentence": "8.“他真的是很坏，devil，devil”",
+    "cp": "传",
+    "time": "1、170320 2、230428梦秀二马尼拉3、231013哥组",
+    "background": "李楷灿说我爱你后李马克的反应",
+    "interpretLink":"https://www.douban.com/group/topic/332395063"
+},
+{
+    "sentence": "9.“给我买电脑的渽民哥，是世界上最帅的男人”",
+    "cp": "盐",
+    "time": "2022年",
+    "background": "一直有着做过不熟氛围的两人，在2022年因为有了共同兴趣爱好游戏csgo而感情极速升温。随口的一句电脑卡死了，被有心的人记到了心里，为其买了一台规格高的电脑，而另一个有心的人为此深深感动，像有了一个恋爱脑一样，就这样两颗心相撞了，盐也开始变甜了。",
+    "statements": [
+        "2022年以前，从来没有想过娜乐能够熟起来。也许是之前环境的不安，也许是彼此还不够熟悉，盐一直是咸咸的。然而就在2022年，两个人开始渐渐走近了，csgo的背后是两个人的努力，我努力向你靠近，你也努力再向我靠近，于是我们的感情发生了质的变化。很难想象出道了六年后，彼此的感情能有这样的变化。这不仅让我想到了我的现实中，好像很难再和一个认识几年但还未熟悉的朋友熟悉起来，感觉彼此早已给彼此定性，也不会再迈开名为友谊的那一步。所以在娜乐的身上，我看到了勇气，也看到了两个人的双向，彼此间的珍惜。这也让我学习到了很多。于是在之后的23年，24年，在如今的25年，小盐也在一直相爱着。这让我觉得很温暖，咸咸的盐竟然有一天也会有变甜的时候。今后的娜乐也请一直相爱吧！"
+    ]
+}
+        ];
+
+        // 截断文本函数
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // 显示模态框
+        function showModal(title, content) {
+            const modal = document.getElementById('modal');
+            const modalText = document.getElementById('modal-text');
+            modalText.innerHTML = `<h3 class="font-semibold mb-3 text-lg">${title}</h3><p class="text-base">${content}</p>`;
+            modal.style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // 创建卡片
+        function createCard(item, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${index}`;
+
+            // 正面
+            const frontFace = document.createElement('div');
+            frontFace.className = 'card-face card-front flex items-center justify-center p-6';
+            frontFace.innerHTML = `
+                <div class="text-center w-full">
+                    <p class="text-lg font-medium leading-relaxed">${item.sentence}</p>
+                </div>
+            `;
+
+            // 反面
+            const backFace = document.createElement('div');
+            backFace.className = 'card-face card-back px-6 py-4 flex flex-col';
+            
+            let backContent = `
+                <div class="text-center mb-4">
+                    <p class="text-lg font-medium mb-3 leading-relaxed">${item.sentence}</p>
+                    <p class="text-base opacity-90">${item.cp}</p>
+                </div>
+                <div class="divider"></div>
+                <div class="flex-1 overflow-auto">
+                    <div class="text-left text-sm space-y-2">
+                        <p class="opacity-80 font-medium">${item.time}</p>
+            `;
+
+            // 添加 background（如果存在且不为空）
+            if (item.background && item.background.trim()) {
+                backContent += `
+                    <p class="opacity-90">
+                        <span class="font-medium">背景：</span>
+                        <span class="clickable-text" onclick="showModal('背景故事', '${item.background.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                            ...
+                        </span>
+                    </p>
+                `;
+            }
+
+            // 添加 statements（如果存在且不为空）
+            if (item.statements && item.statements.length > 0) {
+                item.statements.forEach((statement, idx) => {
+                    backContent += `
+                        <p class="opacity-90">
+                            <span class="font-medium">个人解读：</span>
+                            <span class="clickable-text" onclick="showModal('个人解读 ${idx + 1}', '${statement.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                                ...
+                            </span>
+                        </p>
+                    `;
+                });
+            }
+            // 如果 interpretLink 存在，就插入一个“解读链接”行
+            if (item.interpretLink) {
+            backContent += `
+                <p class="opacity-90 mt-2">
+                <span class="font-medium">解读链接：</span>
+                <a 
+                    href="${item.interpretLink}" 
+                    target="_blank" 
+                    class="text-blue-200 underline hover:text-blue-100"
+                >
+                    ${item.interpretLinkText || item.interpretLink}
+                </a>
+                </p>
+            `;
+            }
+
+            backContent += `
+                    </div>
+                </div>
+            `;
+
+            backFace.innerHTML = backContent;
+
+            // 组装卡片
+            card.appendChild(frontFace);
+            card.appendChild(backFace);
+            cardContainer.appendChild(card);
+
+            // 添加点击事件
+            card.addEventListener('click', function(e) {
+                // 阻止点击可点击文本时触发翻转
+                if (e.target.classList.contains('clickable-text')) {
+                    return;
+                }
+                card.classList.toggle('flipped');
+            });
+
+            return cardContainer;
+        }
+
+        // 初始化页面
+        function init() {
+            const container = document.getElementById('cards-container');
+            data.forEach((item, index) => {
+                const card = createCard(item, index);
+                container.appendChild(card);
+            });
+        }
+
+        // 模态框事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            // 关闭模态框事件
+            const modal = document.getElementById('modal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn.onclick = closeModal;
+            
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        });
+    </script>
+</body>
+</html>

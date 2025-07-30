@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第一组</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            perspective: 1000px;
+            height: 280px;
+            width: 100%;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-front {
+            background: #AD8B73;
+            color: #FFFBE9;
+        }
+        
+        .card-back {
+            background: #AD8B73;
+            color: #FFFBE9;
+            transform: rotateY(180deg);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #CEAB93;
+            margin: 30% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 350px;
+            max-height: 50vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            color: #FFFBE9;
+        }
+        
+        .close {
+            color: #FFFBE9;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            opacity: 0.8;
+        }
+        
+        .close:hover {
+            opacity: 1;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255, 251, 233, 0.3);
+            margin: 12px 0;
+        }
+        
+        .clickable-text {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 251, 233, 0.6);
+        }
+        
+        .clickable-text:hover {
+            text-decoration-color: #FFFBE9;
+        }
+    </style>
+</head>
+<body style="background-color: #E3CAA5;" class="min-h-screen p-4">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-2xl font-bold text-center mb-8" style="color: #AD8B73;">第一组</h1>
+        <div id="cards-container" class="grid grid-cols-1 gap-6">
+            <!-- 卡片将通过 JavaScript 动态生成 -->
+        </div>
+        
+        <!-- 返回按钮 -->
+        <div class="mt-8 text-center">
+            <button onclick="window.location.href='index.html'" class="px-6 py-3 rounded-lg font-medium text-lg transition-all duration-300 hover:scale-105 active:scale-95" style="background-color: #AD8B73; color: #FFFBE9; box-shadow: 0 4px 12px rgba(173, 139, 115, 0.3);">
+                返回首页
+            </button>
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-text" class="leading-relaxed pt-6"></div>
+        </div>
+    </div>
+
+    <script>
+        // 数据
+        const data = [
+{
+    "sentence": "1.“因为有哥所以才变得可能，因为哥我才能活的善良，不要忘记对我的爱，我强制的soulmate”",
+    "cp": "传",
+    "time": "220706",
+    "background": "",
+    "statements": []
+},
+{
+    "sentence": "2.“你今天摸了三次以上，忍忍吧，忍到拍摄结束吧。”",
+    "cp": "盐",
+    "time": "2025.7.28",
+    "background": "",
+    "statements": [
+        "主要是时间够新"
+    ]
+},
+{
+    "sentence": "3.“除了我还经常去见别人啊”",
+    "cp": "笃",
+    "time": "2021",
+    "background": "少年意志训练营",
+    "statements": [
+        "最近对毕螺无话可说，不想拉票了，只希望cp总选时能让我看到你俩的大麦麸"
+    ],
+    "interpretLink":"https://www.douban.com/group/topic/332377536"
+},
+{
+    "sentence": "4.“其实我不是那种经常会感到孤独的类型 但偶尔也会有那种时候，每当那时我就会给叽桑打电话，他每次都会接，所以经常这么聊到凌晨”“我就知道你会选我”",
+    "cp": "壳",
+    "time": "25.2.3",
+    "background": "",
+    "statements": []
+},
+{
+    "sentence": "5.“yushi是谁的？sion的”",
+    "cp": "yusion/牵",
+    "time": "24 3.19",
+    "background": "出道后的第一次音乐放送behind里 在讨论谁是谁的 一开始说了ryo是谁的？ riku说ryo是我的 ryo说是我自己的 最后sion把旁边的yushi抱过来问“yushi是谁的”yushi：“sion的”然后亲了上去",
+    "statements": []
+},
+{
+    "sentence": "6.“其实我不爱你，只是喜欢而已”",
+    "cp": "望",
+    "time": "210510",
+    "background": "正规一时候jn对hc说的话https://weibo.com/6500513834/4635355514930635",
+    "statements": [
+        "对hc来说 我爱你 这三个字只要是自己亲近的人 好像随口就可以说 但jn却很少讲这句话 我爱你对他来说似乎是有些难说出口的但他却又在签售里说“其实比起我爱你，只说喜欢更让人心痒痒”是因为我爱你对hc来说少了珍重意味 想真挚的对他表达喜爱 还是即使在hc已经如此滥用我爱你的情况下 也要推拉的不愿对他说爱？🥰"
+    ]
+},
+{
+    "sentence": "7.“我 以前就见过你。”",
+    "cp": "壳",
+    "time": "2023.3.22",
+    "background": "粉丝签售问🐹的问题 💚：如果现在的你穿越回10年前第一次见到🐬那天，你会想要对当时的他说什么？🐹：",
+    "statements": [
+        "朴宝玉🥹🥹"
+    ]
+},
+{
+    "sentence": "8.“掉到水里了会先救jm jm呢…感觉不会努力活下来”",
+    "cp": "黏",
+    "time": "东是230729，民是231226",
+    "background": "原对话：民：“我们hc尼胆子很小的，因为hc是首先自己得活下来的人”东：掉到水里了会先救jm jm呢…感觉不会努力活下来。22年的签售有人问东掉到水里了会选谁，东说选在民，但是博主没来得及问原因。当时推上年纪说可能是最近很爱在民吧/可能是因为在民讨厌下水吧，总之年纪们都觉得肯定不会是很浪漫的原因。时隔一年后，终于有人在签售上问了东河原因，东河只轻飘飘地说了一句原耽般的话”在民呢…感觉不会努力活下来。“民：Q. 因为“框！”的声音被吓醒 好像哪里发生了突发事件 认为hc会最先做的行为是?A. 感觉会穿着睡衣逃跑 我们hc尼胆子很小的 因为hc是首先自己得活下来的人",
+    "statements": [
+        "不愿意被死亡掐住喉咙的人和不愿意寻找生的希望的人。但胆小鬼也会愿意在逃跑的半路跳进水里把已经闭上眼睛的人救起，也不是一定要让你活着，只是想让你少一点痛苦。"
+    ]
+},
+{
+    "sentence": "9.“李马克 妈妈 爸爸”",
+    "cp": "传",
+    "time": "240213",
+    "background": "线上签售让老联说出现在最爱的三个人的名字",
+    "statements": []
+}
+        ];
+
+        // 截断文本函数
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // 显示模态框
+        function showModal(title, content) {
+            const modal = document.getElementById('modal');
+            const modalText = document.getElementById('modal-text');
+            modalText.innerHTML = `<h3 class="font-semibold mb-3 text-lg">${title}</h3><p class="text-base">${content}</p>`;
+            modal.style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // 创建卡片
+        function createCard(item, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${index}`;
+
+            // 正面
+            const frontFace = document.createElement('div');
+            frontFace.className = 'card-face card-front flex items-center justify-center p-6';
+            frontFace.innerHTML = `
+                <div class="text-center w-full">
+                    <p class="text-lg font-medium leading-relaxed">${item.sentence}</p>
+                </div>
+            `;
+
+            // 反面
+            const backFace = document.createElement('div');
+            backFace.className = 'card-face card-back px-6 py-4 flex flex-col';
+            
+            let backContent = `
+                <div class="text-center mb-4">
+                    <p class="text-lg font-medium mb-3 leading-relaxed">${item.sentence}</p>
+                    <p class="text-base opacity-90">${item.cp}</p>
+                </div>
+                <div class="divider"></div>
+                <div class="flex-1 overflow-auto">
+                    <div class="text-left text-sm space-y-2">
+                        <p class="opacity-80 font-medium">${item.time}</p>
+            `;
+
+            // 添加 background（如果存在且不为空）
+            if (item.background && item.background.trim()) {
+                backContent += `
+                    <p class="opacity-90">
+                        <span class="font-medium">背景：</span>
+                        <span class="clickable-text" onclick="showModal('背景故事', '${item.background.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                            ...
+                        </span>
+                    </p>
+                `;
+            }
+
+            // 添加 statements（如果存在且不为空）
+            if (item.statements && item.statements.length > 0) {
+                item.statements.forEach((statement, idx) => {
+                    backContent += `
+                        <p class="opacity-90">
+                            <span class="font-medium">个人解读：</span>
+                            <span class="clickable-text" onclick="showModal('个人解读 ${idx + 1}', '${statement.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                                ...
+                            </span>
+                        </p>
+                    `;
+                });
+            }
+            // 如果 interpretLink 存在，就插入一个“解读链接”行
+            if (item.interpretLink) {
+            backContent += `
+                <p class="opacity-90 mt-2">
+                <span class="font-medium">解读链接：</span>
+                <a 
+                    href="${item.interpretLink}" 
+                    target="_blank" 
+                    class="text-blue-200 underline hover:text-blue-100"
+                >
+                    ${item.interpretLinkText || item.interpretLink}
+                </a>
+                </p>
+            `;
+            }
+
+            backContent += `
+                    </div>
+                </div>
+            `;
+
+            backFace.innerHTML = backContent;
+
+            // 组装卡片
+            card.appendChild(frontFace);
+            card.appendChild(backFace);
+            cardContainer.appendChild(card);
+
+            // 添加点击事件
+            card.addEventListener('click', function(e) {
+                // 阻止点击可点击文本时触发翻转
+                if (e.target.classList.contains('clickable-text')) {
+                    return;
+                }
+                card.classList.toggle('flipped');
+            });
+
+            return cardContainer;
+        }
+
+        // 初始化页面
+        function init() {
+            const container = document.getElementById('cards-container');
+            data.forEach((item, index) => {
+                const card = createCard(item, index);
+                container.appendChild(card);
+            });
+        }
+
+        // 模态框事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            // 关闭模态框事件
+            const modal = document.getElementById('modal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn.onclick = closeModal;
+            
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        });
+    </script>
+</body>
+</html>

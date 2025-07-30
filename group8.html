@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第八组</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            perspective: 1000px;
+            height: 280px;
+            width: 100%;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-front {
+            background: #AD8B73;
+            color: #FFFBE9;
+        }
+        
+        .card-back {
+            background: #AD8B73;
+            color: #FFFBE9;
+            transform: rotateY(180deg);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #CEAB93;
+            margin: 30% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 350px;
+            max-height: 50vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            color: #FFFBE9;
+        }
+        
+        .close {
+            color: #FFFBE9;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            opacity: 0.8;
+        }
+        
+        .close:hover {
+            opacity: 1;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255, 251, 233, 0.3);
+            margin: 12px 0;
+        }
+        
+        .clickable-text {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 251, 233, 0.6);
+        }
+        
+        .clickable-text:hover {
+            text-decoration-color: #FFFBE9;
+        }
+    </style>
+</head>
+<body style="background-color: #E3CAA5;" class="min-h-screen p-4">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-2xl font-bold text-center mb-8" style="color: #AD8B73;">第八组</h1>
+        <div id="cards-container" class="grid grid-cols-1 gap-6">
+            <!-- 卡片将通过 JavaScript 动态生成 -->
+        </div>
+        
+        <!-- 返回按钮 -->
+        <div class="mt-8 text-center">
+            <button onclick="window.location.href='index.html'" class="px-6 py-3 rounded-lg font-medium text-lg transition-all duration-300 hover:scale-105 active:scale-95" style="background-color: #AD8B73; color: #FFFBE9; box-shadow: 0 4px 12px rgba(173, 139, 115, 0.3);">
+                返回首页
+            </button>
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-text" class="leading-relaxed pt-6"></div>
+        </div>
+    </div>
+
+    <script>
+        // 数据
+        const data = [
+{
+    "sentence": "1.“就算是过去了8250天都还是一样的 hc啊 你一点都没变 虽然没有变化是最难的但不会有变化的”",
+    "cp": "黏",
+    "time": "“Go back to The Future” listening party",
+    "background": "jm遇到825天后的hc想对他说什么话？！",
+    "statements": [
+        "罗渽民在这件事情上对李东赫有种盲目的感性的扎实的信任，没有缘由的，虽然知道不变是最难的，但依然会认为李东赫不会变。但当听到这个不会变会感到一丝痛苦，我们之间的距离是一种洛希极限，是再进一步再爱你一点就会撕裂一方的后果。总会觉着他俩对彼此的感受和第一次见面是一模一样的，他俩面对彼此的状态很原始停留在14岁或者15岁，这很自愿也很默契的。而在这个活动前的梦秀首尔末场，罗渽民说他是抱着“把每一天都当成最后一天”的想法生活的人，李东赫说他带着“没有明天”的心情努力做了。这种极限的默契是他俩能够给对方一个烧灯续昼的“今天”做出的觉悟。活在当下，周围的一切都飞速旋转不断变化的时候，我知道你不会变，你和我都是抓住“今天”的人，你是这段旅途中我能抓到的距离不会变近的但又最坚实的锚点。"
+    ]
+},
+{
+    "sentence": "2.“喜欢楷灿，还是喜欢东赫”",
+    "cp": "传",
+    "time": "25.7.21",
+    "background": "Dream vs Dream 2025",
+    "statements": [
+        "时隔七年的梦对梦，当日常已经融化于血肉，彼此的讨厌和喜欢已经变成了习惯，变成争执要不要去吃血肠汤的一个个午后。日常和非日常的界限在哪里，本心与表演的界限在哪里，东赫和楷灿的界限又在哪里。又或者说，因为无论在界限的哪一边，我们都彼此见证，所以界限从来都不存在。我了解的，从来都是一体两面的你。"
+    ]
+},
+{
+    "sentence": "3.“叽桑酒量不太行，所以我们有时候玩游戏输了，我替他喝过好多杯。不是我照顾他，只是我不想看他醉。”",
+    "cp": "壳",
+    "time": "2022.6.23",
+    "background": "老叻直播大谈地租酒量，说到叽桑不能喝，无意间泄露天机后欲盖弥彰找补",
+    "statements": [
+        "如果说老叽的情话是无可救药的浪漫主义者出口成章，那么老叻的情话就是撬开蚌壳发现的小米珠，是顺直自己都难以察觉的隐匿温柔。老叻你告诉我，如果哭是因为害羞，流泪是因为打哈欠，给他做饭是因为不想剩饭，挡酒不是照顾是不想看他醉，心动是荷尔蒙作祟，所有感性都受控于理性，所有私欲都让步于大义，那人们要怎么认清自己的心呢。"
+    ]
+},
+{
+    "sentence": "4.“不能太赢辰乐了，他会生气的”",
+    "cp": "壳",
+    "time": "2022 陈志第二季13集",
+    "background": "在大比分领先老婆之后，牢记深谙老婆性格，趁老婆不在摄像头前对摄像头发出内心独白：不能太赢cl了，不然他会生气的～然后在接下来的比赛中放海，让老婆找回成就感，且一直夸夸",
+    "statements": []
+},
+{
+    "sentence": "5.“只有我吗”",
+    "cp": "壳",
+    "time": "2019.3.2",
+    "background": "原对话：“我梦见我回上海了，你也在”“只有我吗”“嗯”。在梦梦一起看完sj演唱会回家的路上辰志一起直播，辰乐突然想到他昨天梦见他回上海了，志晟也在，然后又继续开始叭叭的讲，叽桑问只有我吗？辰乐肯定地“嗯”然后又开始叭叭的讲。辰乐说他们在上海一起去玩了真人射击游戏，一起去了南京路步行街，爸爸妈妈带他们一起出去吃饭，辰乐还说“因为太神奇，一醒来我就跟妈妈分享了这个梦”。在这场直播过后没多久，一个让科技惦记一辈子的物料出现了《辰志的这个那个》-上海篇，他们在这期辰志里完成了辰乐梦里出现的所有情景。",
+    "statements": [
+        "上海是辰乐最思念的故乡，而梦里唯独出现朴志晟的身影。费洛伊德说梦是潜意识的投射，是辰乐的潜意识将 家乡-志晟-未来 串联起来，这是否能证明辰乐潜意识将朴志晟划进了自己的人生蓝图。就像粉丝问起这次去上海如果带成员回家会选择谁，而辰乐的回答里没有出现牢记，在粉丝的疑问下，辰乐回答“本来就要带他回去的。”其实辰乐早已下意识将朴志晟划进了自己的特殊领域。辰乐对着牢记吧啦吧啦自己梦里发生的各种事情之后，还欲盖弥彰的说“不过梦总是相反的，咱俩绝对不会去的”，特意加重的“绝对”俩字，反而在我眼里像是此地无银三百两得展现出自己对梦中事梦中人的期待激动。而牢记看似随口一问实际上是下意识的反应，他在乎是不是只有他们俩，是不是没有第三个人的出现。在一个月后，在他们的期待中，辰乐的梦境在现实中重现。好了说了一堆乱七八糟的，简而言之就是，在辰乐的潜意识里“我的未来，有上海，有你”，而牢记的重点却是“只有我们”。（这个拉票宣言写的乱七八糟，其实大家直接看句子更好磕）🥲"
+    ]
+},
+{
+    "sentence": "6.“李楷灿使用注意事项:“他可能会(说我爱你/划掉)说谎。”",
+    "cp": "传",
+    "time": "231013哥组电台",
+    "background": "李马克给李楷灿写的使用注意事项",
+    "interpretLink":"https://www.douban.com/group/topic/332395063"
+},
+{
+    "sentence": "7. “谢谢，还有，我们都不要改变吧！！”",
+    "cp": "壳",
+    "time": "21年",
+    "background": "老壳给对方写信https://weibo.com/6542641477/5164556636655617",
+    "statements": [
+        "有些人用味觉来记忆，有些人用触觉来记忆，而大部分人则是最普通的那一种——触景生情。偶尔路过广安里，朴志晟会想起和钟辰乐在釜山坐缆车乘轮渡的那一天；钟辰乐在YouTube刷到最近很流行的上海vlog，会想起和很多年为了赶上那班过江轮渡在外滩奔跑时朴志晟的喘气声；朴志晟遇到新出道的后辈来打招呼，会想起刚出道的辰乐不会说韩语，只是笑眯眯地看着镜头。这些日子好像过了好久，旧的回忆被新的经历覆盖，很多事情他们逐渐记不起，或是有新的主角参与到故事中。朴志晟回到釜山和小学同学吃的汤饭依然美味，对上海的印象变成许多次签售；钟辰乐主动忘掉了自己出道时的样子，他更习惯于叫上李马克或是其他搭子打篮球，再也没耐心一遍遍从头教谁投篮。对朴志晟和钟辰乐来说，成长是一场竞赛，但在彼此身边，对方身上总是映照出自己的纯真年代。于是他们略带残忍地亲眼看着这些记忆被覆盖。改变是好事吗？候鸟从不把迁徙叫做宿命，它们只是在季风来临时率先展开翅膀。"
+    ]
+},
+{
+    "sentence": "8.“pabo 我觉得是带有爱意的表达 不是有这种说法嘛？大海的宝物（바다의 보물） 所以说你是pabo 这样的 我觉得pabo 是很可爱的说法哟咯本 陈咯呢…是pabo呀”",
+    "cp": "壳",
+    "time": "2024-07-14",
+    "background": "朴志晟语音直播",
+    "statements": [
+        "人生是一段又一段奇妙的体验组成的，很庆幸我们明明生在不同国度下，长在不同文化、形成不同性格后还能有共度彼此人生的机会，有时候常常在想，如果没有遇到彼此的你们会怎么度过？辰乐最喜欢说：“何时才不会捉弄jisung？我也不知道，可能捉弄他也是喜欢的表现” 志晟也喜欢说：“呦罗本，我和辰乐哥成为朋友了！”如果我们没有相遇，辰乐会遇到一个这样像妈妈的弟弟朋友吗？志晟会遇到这样一个好像刻进人生隧道的朋友吗？所有辰志在一起的时刻我都很喜欢，喜欢你们把彼此放在身后、喜欢你们舞台上走向对方、喜欢你们困困的依偎对方（虽然不多见哈），有这样一个朋友陪伴自己的青春期，很幸福吧？我也因为你们在幸福而幸福"
+    ]
+},
+        ];
+
+        // 截断文本函数
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // 显示模态框
+        function showModal(title, content) {
+            const modal = document.getElementById('modal');
+            const modalText = document.getElementById('modal-text');
+            modalText.innerHTML = `<h3 class="font-semibold mb-3 text-lg">${title}</h3><p class="text-base">${content}</p>`;
+            modal.style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // 创建卡片
+        function createCard(item, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${index}`;
+
+            // 正面
+            const frontFace = document.createElement('div');
+            frontFace.className = 'card-face card-front flex items-center justify-center p-6';
+            frontFace.innerHTML = `
+                <div class="text-center w-full">
+                    <p class="text-lg font-medium leading-relaxed">${item.sentence}</p>
+                </div>
+            `;
+
+            // 反面
+            const backFace = document.createElement('div');
+            backFace.className = 'card-face card-back px-6 py-4 flex flex-col';
+            
+            let backContent = `
+                <div class="text-center mb-4">
+                    <p class="text-lg font-medium mb-3 leading-relaxed">${item.sentence}</p>
+                    <p class="text-base opacity-90">${item.cp}</p>
+                </div>
+                <div class="divider"></div>
+                <div class="flex-1 overflow-auto">
+                    <div class="text-left text-sm space-y-2">
+                        <p class="opacity-80 font-medium">${item.time}</p>
+            `;
+
+            // 添加 background（如果存在且不为空）
+            if (item.background && item.background.trim()) {
+                backContent += `
+                    <p class="opacity-90">
+                        <span class="font-medium">背景：</span>
+                        <span class="clickable-text" onclick="showModal('背景故事', '${item.background.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                            ...
+                        </span>
+                    </p>
+                `;
+            }
+
+            // 添加 statements（如果存在且不为空）
+            if (item.statements && item.statements.length > 0) {
+                item.statements.forEach((statement, idx) => {
+                    backContent += `
+                        <p class="opacity-90">
+                            <span class="font-medium">个人解读：</span>
+                            <span class="clickable-text" onclick="showModal('个人解读 ${idx + 1}', '${statement.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                                ...
+                            </span>
+                        </p>
+                    `;
+                });
+            }
+            // 如果 interpretLink 存在，就插入一个“解读链接”行
+            if (item.interpretLink) {
+            backContent += `
+                <p class="opacity-90 mt-2">
+                <span class="font-medium">解读链接：</span>
+                <a 
+                    href="${item.interpretLink}" 
+                    target="_blank" 
+                    class="text-blue-200 underline hover:text-blue-100"
+                >
+                    ${item.interpretLinkText || item.interpretLink}
+                </a>
+                </p>
+            `;
+            }
+
+            backContent += `
+                    </div>
+                </div>
+            `;
+
+            backFace.innerHTML = backContent;
+
+            // 组装卡片
+            card.appendChild(frontFace);
+            card.appendChild(backFace);
+            cardContainer.appendChild(card);
+
+            // 添加点击事件
+            card.addEventListener('click', function(e) {
+                // 阻止点击可点击文本时触发翻转
+                if (e.target.classList.contains('clickable-text')) {
+                    return;
+                }
+                card.classList.toggle('flipped');
+            });
+
+            return cardContainer;
+        }
+
+        // 初始化页面
+        function init() {
+            const container = document.getElementById('cards-container');
+            data.forEach((item, index) => {
+                const card = createCard(item, index);
+                container.appendChild(card);
+            });
+        }
+
+        // 模态框事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            // 关闭模态框事件
+            const modal = document.getElementById('modal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn.onclick = closeModal;
+            
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        });
+    </script>
+</body>
+</html>

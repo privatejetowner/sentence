@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第六组</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            perspective: 1000px;
+            height: 280px;
+            width: 100%;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-front {
+            background: #AD8B73;
+            color: #FFFBE9;
+        }
+        
+        .card-back {
+            background: #AD8B73;
+            color: #FFFBE9;
+            transform: rotateY(180deg);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #CEAB93;
+            margin: 30% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 350px;
+            max-height: 50vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            color: #FFFBE9;
+        }
+        
+        .close {
+            color: #FFFBE9;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            opacity: 0.8;
+        }
+        
+        .close:hover {
+            opacity: 1;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255, 251, 233, 0.3);
+            margin: 12px 0;
+        }
+        
+        .clickable-text {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 251, 233, 0.6);
+        }
+        
+        .clickable-text:hover {
+            text-decoration-color: #FFFBE9;
+        }
+    </style>
+</head>
+<body style="background-color: #E3CAA5;" class="min-h-screen p-4">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-2xl font-bold text-center mb-8" style="color: #AD8B73;">第六组</h1>
+        <div id="cards-container" class="grid grid-cols-1 gap-6">
+            <!-- 卡片将通过 JavaScript 动态生成 -->
+        </div>
+        
+        <!-- 返回按钮 -->
+        <div class="mt-8 text-center">
+            <button onclick="window.location.href='index.html'" class="px-6 py-3 rounded-lg font-medium text-lg transition-all duration-300 hover:scale-105 active:scale-95" style="background-color: #AD8B73; color: #FFFBE9; box-shadow: 0 4px 12px rgba(173, 139, 115, 0.3);">
+                返回首页
+            </button>
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-text" class="leading-relaxed pt-6"></div>
+        </div>
+    </div>
+
+    <script>
+        // 数据
+        const data = [
+{
+    "sentence": "1.“看你的时候仿佛也在看着时间”",
+    "cp": "传",
+    "time": "2020.09.02",
+    "background": "",
+    "statements": [
+        "如果一个人对你说从你身上感受到时间，长大会不会是一件还算动人的好事。"
+    ]
+},
+{
+    "sentence": "2.“辰乐呀我选到的时间点是一周后，一周后辰乐还是我的朋友吧?一周后我们是否还是相爱的关系?就算不是也没有关系，不管是一周、一年还是十年，我都会是你的朋友，这一周要好好度过，慢慢的。Let's do it， baby。”",
+    "cp": "球",
+    "time": "2023.7.19",
+    "background": "",
+    "statements": [
+        "朋友 我当你一秒朋友朋友 我当你一世朋友"
+    ]
+},
+{
+    "sentence": "3.“不要借评论说你想说的话”",
+    "cp": "壳",
+    "time": "23.4.4",
+    "background": "“辰乐i love you”“不要借评论说你想说的话”",
+    "statements": []
+},
+{
+    "sentence": "4.“我本来是真的不怎么说这种话的 但这张专辑说实话辰乐carry了”",
+    "cp": "壳",
+    "time": "2023.7.18",
+    "background": "互相给心心的环节制成👉 陈咯❤️❤️❤️❤️❤️制成：我当然是给5颗心了！陈咯：哦莫！制成：我本来是真的不怎么说这种话的 但这张专辑说实话陈咯carry了（制成说的同时陈咯立刻换❤️❤️❤️❤️❤️大家都笑了hhhhh）",
+    "statements": []
+},
+{
+    "sentence": "5.“再送一次漂亮的大衣…是开玩笑的啦（笑）。我真的很想送他一首好歌。从没见过比🐬对待唱歌还认真的人，他真的能通过音乐感受到幸福，所以很想送他一首歌词优美的曲子。🐬大概会为此幸福一辈子吧。像「My youth」「ANL」「Graduation」之类的曲子就很好。是那种喜欢到如果是其他组合唱的话会嫉妒的好歌，所以想送给他这样一首完美的歌曲。”",
+    "cp": "壳",
+    "time": "2025.03",
+    "background": "原对话：问：给队友送礼物的话会送什么？🐹：再送一次漂亮的大衣…是开玩笑的啦（笑）。我真的很想送他一首好歌。从没见过比🐬对待唱歌还认真的人，他真的能通过音乐感受到幸福，所以很想送他一首歌词优美的曲子。🐬大概会为此幸福一辈子吧。像「My youth」「ANL」「Graduation」之类的曲子就很好。是那种喜欢到如果是其他组合唱的话会嫉妒的好歌，所以想送给他这样一首完美的歌曲。日本fc会刊Dreamzine Vol.5 双人采访部分，关于送礼物的问题，js再次大篇幅提到大衣（真的很在意这件大衣～），但是意外地提到想送给cl一首无与伦比的歌，但其实排版来看是想送给他俩的双人曲哦。",
+    "statements": [
+        "从js无数次赞美cl的声音撕碎了carry了，到想和cl一起cover，到想送cl送一首好歌，到直接首提lelo，再到因为看到cl在中国的舞台而想那样帅气地唱歌跳舞，深深感受到js对cl唱歌事业的欣赏和支持，以及cl对js的积极影响，相信这样良好健康的关系会走得很远。"
+    ]
+},
+{
+    "sentence": "6.“那我每一期都当你的嘉宾”",
+    "cp": "壳",
+    "time": "某一期辰志结尾",
+    "background": "“这是辰志这个那个最后一集，下一集开始是辰乐的这个那个”“那我每一期都当你的嘉宾”",
+    "statements": [
+        "言情小说想不到梗可以过来抄了"
+    ]
+},
+{
+    "sentence": "7.“既然是关于我人生的专辑，从这个意义上来说，觉得你作为这张专辑的featuring很有意义。你懂我意思吧？”",
+    "cp": "传",
+    "time": "250322",
+    "background": "托联直播",
+    "statements": [
+        "我们托联就这样一直参与彼此的人生从校园到婚纱🥰",
+        "整段话由“有点……你知道的”这句犹疑、模糊、无从着落的语句开场，最后由“你懂我意思吧”小心翼翼的发问来收束，中间则是李马克自己向李楷灿再次阐明他对自己的重要性。这是一场缓慢而诚恳的自我剖白，我的人生专辑，你加入进来定是很有意义的。然而纵然一起相处了十余年，依旧害怕对方没能明了自己的真心，李马克说话的全过程配备着华丽的手势和乱飘的眼睛，直到最后一刻才敢朝李楷灿的方向望过去，问“你懂我意思吧？”你知道你真的对我来说很重要吧？ 而平时嘈杂的李楷灿也安静地点头，收下了李马克给出的所有情绪。化用一段话，觉得写给他们很合适。从来没有一种关系能像他们两个一样，拥有强大的扩张力与感应力，能容纳双方同时在这段关系的时间线里交换人生经验，共享探索知识，体察社会，爬梳经验，思考生命奥义的轨迹与成果。李马克和李楷灿一起长大，站在+82pressin的节点时，他们时常一起回想当年一起表演billionaire的时候。李楷灿的多变不再会是问题，无论爱上泡菜汤爱上火锅抑或是也要将火锅抛弃，无论怎么变心，不变的会是李马克自然会陪着吃。因为在这段关系里，可以把前世与今生，圣经与祷告，生日的信与祝福，累时痛时埋在对方的肩头与机场共同分享的耳机，照片里给太阳标记的fullsun与一同参加的婚礼，一起晃晃荡荡地长大，又一起慢慢悠悠老去的感觉。"
+    ]
+},
+{
+    "sentence": "8.“不是最近 只是最近有点被抓到多了点而已”",
+    "cp": "黏",
+    "time": "250722",
+    "background": "大家说最近在米和开饭变亲近了？",
+    "statements": [
+        "比起互嘴开玩笑总是温情更多一分的黏儿 很喜欢你就算开玩笑也不会忘记要照顾你 dancebreak之后会给递水 完成两队份舞台之后发蒙会关心是不是很累 想起来18岁的时候一起去吃冰 还是会生气对方不理解自己的年纪 恋恋觉得牛奶冰好吃还是想罗罗尝一口 罗罗觉得自己不爱吃恋恋还是点了牛奶 最近被抓到有点多是因为25岁的罗罗脸脸不会再把关心藏在玩笑后面想要光明正大的对你更好一点 我宝宝们和我宝宝们的爱都长大了🤧"
+    ]
+}
+
+        ];
+
+        // 截断文本函数
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // 显示模态框
+        function showModal(title, content) {
+            const modal = document.getElementById('modal');
+            const modalText = document.getElementById('modal-text');
+            modalText.innerHTML = `<h3 class="font-semibold mb-3 text-lg">${title}</h3><p class="text-base">${content}</p>`;
+            modal.style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // 创建卡片
+        function createCard(item, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${index}`;
+
+            // 正面
+            const frontFace = document.createElement('div');
+            frontFace.className = 'card-face card-front flex items-center justify-center p-6';
+            frontFace.innerHTML = `
+                <div class="text-center w-full">
+                    <p class="text-lg font-medium leading-relaxed">${item.sentence}</p>
+                </div>
+            `;
+
+            // 反面
+            const backFace = document.createElement('div');
+            backFace.className = 'card-face card-back px-6 py-4 flex flex-col';
+            
+            let backContent = `
+                <div class="text-center mb-4">
+                    <p class="text-lg font-medium mb-3 leading-relaxed">${item.sentence}</p>
+                    <p class="text-base opacity-90">${item.cp}</p>
+                </div>
+                <div class="divider"></div>
+                <div class="flex-1 overflow-auto">
+                    <div class="text-left text-sm space-y-2">
+                        <p class="opacity-80 font-medium">${item.time}</p>
+            `;
+
+            // 添加 background（如果存在且不为空）
+            if (item.background && item.background.trim()) {
+                backContent += `
+                    <p class="opacity-90">
+                        <span class="font-medium">背景：</span>
+                        <span class="clickable-text" onclick="showModal('背景故事', '${item.background.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                            ...
+                        </span>
+                    </p>
+                `;
+            }
+
+            // 添加 statements（如果存在且不为空）
+            if (item.statements && item.statements.length > 0) {
+                item.statements.forEach((statement, idx) => {
+                    backContent += `
+                        <p class="opacity-90">
+                            <span class="font-medium">个人解读：</span>
+                            <span class="clickable-text" onclick="showModal('个人解读 ${idx + 1}', '${statement.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                                ...
+                            </span>
+                        </p>
+                    `;
+                });
+            }
+            // 如果 interpretLink 存在，就插入一个“解读链接”行
+            if (item.interpretLink) {
+            backContent += `
+                <p class="opacity-90 mt-2">
+                <span class="font-medium">解读链接：</span>
+                <a 
+                    href="${item.interpretLink}" 
+                    target="_blank" 
+                    class="text-blue-200 underline hover:text-blue-100"
+                >
+                    ${item.interpretLinkText || item.interpretLink}
+                </a>
+                </p>
+            `;
+            }
+
+            backContent += `
+                    </div>
+                </div>
+            `;
+
+            backFace.innerHTML = backContent;
+
+            // 组装卡片
+            card.appendChild(frontFace);
+            card.appendChild(backFace);
+            cardContainer.appendChild(card);
+
+            // 添加点击事件
+            card.addEventListener('click', function(e) {
+                // 阻止点击可点击文本时触发翻转
+                if (e.target.classList.contains('clickable-text')) {
+                    return;
+                }
+                card.classList.toggle('flipped');
+            });
+
+            return cardContainer;
+        }
+
+        // 初始化页面
+        function init() {
+            const container = document.getElementById('cards-container');
+            data.forEach((item, index) => {
+                const card = createCard(item, index);
+                container.appendChild(card);
+            });
+        }
+
+        // 模态框事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            // 关闭模态框事件
+            const modal = document.getElementById('modal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn.onclick = closeModal;
+            
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        });
+    </script>
+</body>
+</html>
