@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test</title>
+    <title>卡片翻转展示</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .card-container {
             perspective: 1000px;
-            height: 200px;
+            height: 280px;
             width: 100%;
         }
         
@@ -105,8 +105,8 @@
 </head>
 <body style="background-color: #E3CAA5;" class="min-h-screen p-4">
     <div class="max-w-4xl mx-auto px-4">
-        <h1 class="text-2xl font-bold text-center mb-8" style="color: #AD8B73;">test</h1>
-        <div id="cards-container" class="grid grid-cols-2 gap-6">
+        <h1 class="text-2xl font-bold text-center mb-8" style="color: #AD8B73;">卡片展示</h1>
+        <div id="cards-container" class="grid grid-cols-1 gap-6">
             <!-- 卡片将通过 JavaScript 动态生成 -->
         </div>
     </div>
@@ -123,7 +123,7 @@
         // 数据
         const data = [
             {
-                "sentence": "啦啦啦",
+                "sentence": "我会守护你。",
                 "cp": "张三×李四",
                 "time": "2025年七月",
                 "background": "这是一次约定的重逢。",
@@ -180,49 +180,43 @@
 
             // 反面
             const backFace = document.createElement('div');
-            backFace.className = 'card-face card-back p-6 flex flex-col justify-between';
+            backFace.className = 'card-face card-back px-6 py-4 flex flex-col';
             
             let backContent = `
-                <div class="text-center mb-3">
-                    <p class="text-base font-medium mb-2">${item.sentence}</p>
-                    <p class="text-sm opacity-90">${item.cp}</p>
+                <div class="text-center mb-4">
+                    <p class="text-lg font-medium mb-3 leading-relaxed">${item.sentence}</p>
+                    <p class="text-base opacity-90">${item.cp}</p>
                 </div>
                 <div class="divider"></div>
-                <div class="flex-1">
-                    <div class="text-left text-sm">
-                        <p class="mb-2 opacity-80">${item.time}</p>
+                <div class="flex-1 overflow-hidden">
+                    <div class="text-left text-sm space-y-2">
+                        <p class="opacity-80 font-medium">${item.time}</p>
             `;
 
-            // 添加 background（如果存在）
+            // 添加 background（如果存在且不为空）
             if (item.background && item.background.trim()) {
-                const truncatedBg = truncateText(item.background, 1);
-                const needsTruncation = item.background.length > 1;
                 backContent += `
-                    <p class="mb-2 opacity-90">
-                        <span class="${needsTruncation ? 'clickable-text' : ''}" 
-                              ${needsTruncation ? `onclick="showModal('背景故事', '${item.background.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')"` : ''}>
-                            ${truncatedBg}
+                    <p class="opacity-90">
+                        <span class="font-medium">背景：</span>
+                        <span class="clickable-text" onclick="showModal('背景故事', '${item.background.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                            ...
                         </span>
                     </p>
                 `;
             }
 
-            // 添加 statements（如果存在）
+            // 添加 statements（如果存在且不为空）
             if (item.statements && item.statements.length > 0) {
-                backContent += '<div class="mt-2">';
                 item.statements.forEach((statement, idx) => {
-                    const truncatedStatement = truncateText(statement, 1);
-                    const needsTruncation = statement.length > 1;
                     backContent += `
-                        <p class="mb-1 text-xs opacity-90">
-                            <span class="${needsTruncation ? 'clickable-text' : ''}"
-                                  ${needsTruncation ? `onclick="showModal('声明 ${idx + 1}', '${statement.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')"` : ''}>
-                                ${truncatedStatement}
+                        <p class="opacity-90">
+                            <span class="font-medium">个人解读：</span>
+                            <span class="clickable-text" onclick="showModal('个人解读 ${idx + 1}', '${statement.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                                ...
                             </span>
                         </p>
                     `;
                 });
-                backContent += '</div>';
             }
 
             backContent += `
