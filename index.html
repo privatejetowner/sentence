@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插排组cp金句大赛</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .group-button {
+            background-color: #AD8B73;
+            color: #FFFBE9;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(173, 139, 115, 0.3);
+        }
+        
+        .group-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(173, 139, 115, 0.4);
+        }
+        
+        .group-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .header-text {
+            color: #AD8B73;
+            text-shadow: 0 2px 4px rgba(173, 139, 115, 0.2);
+        }
+        
+        .subtitle {
+            color: #AD8B73;
+        }
+        
+        .container-bg {
+            background: linear-gradient(135deg, rgba(206, 171, 147, 0.1) 0%, rgba(227, 202, 165, 0.1) 100%);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(173, 139, 115, 0.15);
+        }
+    </style>
+</head>
+<body style="background-color: #E3CAA5;" class="min-h-screen p-4">
+    <div class="max-w-4xl mx-auto px-4">
+        <!-- 头部标题 -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold header-text mb-2">插排组cp金句大赛</h1>
+            <p class="text-lg subtitle">2025.7</p>
+        </div>
+        
+        <!-- 组别选择容器 -->
+        <div class="container-bg p-6 mb-8">
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(9)">
+                    <div class="flex flex-col items-center">
+                        <span>决赛</span>
+                    </div>
+                </button>
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(0)">
+                    <div class="flex flex-col items-center">
+                        <span>复活赛</span>
+                    </div>
+                </button>
+                <!-- 1-4组 -->
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(1)">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">①</span>
+                        <span>第1组</span>
+                    </div>
+                </button>
+                
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(2)">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">②</span>
+                        <span>第2组</span>
+                    </div>
+                </button>
+                
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(3)">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">③</span>
+                        <span>第3组</span>
+                    </div>
+                </button>
+                
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(4)">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">④</span>
+                        <span>第4组</span>
+                    </div>
+                </button>
+                
+                <!-- 5-8组 -->
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(5)">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">⑤</span>
+                        <span>第5组</span>
+                    </div>
+                </button>
+                
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(6)">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">⑥</span>
+                        <span>第6组</span>
+                    </div>
+                </button>
+                
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(7)">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">⑦</span>
+                        <span>第7组</span>
+                    </div>
+                </button>
+                
+                <button class="group-button px-6 py-4 rounded-lg font-medium text-lg" onclick="navigateToGroup(8)">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">⑧</span>
+                        <span>第8组</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 说明文字 -->
+        <div class="text-center">
+            <div class="container-bg p-4">
+                <p class="subtitle text-sm leading-relaxed">
+                    点击上方按钮查看对应组别的卡片内容
+                </p>
+            </div>
+        </div>
+        
+
+    </div>
+
+    <script>
+        function navigateToGroup(groupNumber) {
+            // 跳转到对应组别的页面
+            // 您可以根据实际文件命名修改这里的跳转逻辑
+            window.location.href = `group${groupNumber}.html`;
+        }
+        
+        // 添加页面加载动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.group-button');
+            buttons.forEach((button, index) => {
+                button.style.opacity = '0';
+                button.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    button.style.transition = 'all 0.5s ease';
+                    button.style.opacity = '1';
+                    button.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+        
+        // 添加按钮点击反馈
+        document.querySelectorAll('.group-button').forEach(button => {
+            button.addEventListener('click', function() {
+                // 创建点击波纹效果
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 251, 233, 0.3)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.left = '50%';
+                ripple.style.top = '50%';
+                ripple.style.width = '100px';
+                ripple.style.height = '100px';
+                ripple.style.marginLeft = '-50px';
+                ripple.style.marginTop = '-50px';
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+        
+        // 添加ripple动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>决赛</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            perspective: 1000px;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-front {
+            background: #AD8B73;
+            color: #FFFBE9;
+        }
+        
+        .card-back {
+            background: #AD8B73;
+            color: #FFFBE9;
+            transform: rotateY(180deg);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #CEAB93;
+            margin: 30% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 350px;
+            max-height: 50vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            color: #FFFBE9;
+        }
+        
+        .close {
+            color: #FFFBE9;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            opacity: 0.8;
+        }
+        
+        .close:hover {
+            opacity: 1;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255, 251, 233, 0.3);
+            margin: 12px 0;
+        }
+        
+        .clickable-text {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 251, 233, 0.6);
+        }
+        
+        .clickable-text:hover {
+            text-decoration-color: #FFFBE9;
+        }
+    </style>
+</head>
+<body style="background-color: #E3CAA5;" class="min-h-screen p-4">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-2xl font-bold text-center mb-8" style="color: #AD8B73;">决赛</h1>
+        <div id="cards-container" class="grid grid-cols-1 gap-6">
+            <!-- 卡片将通过 JavaScript 动态生成 -->
+        </div>
+        
+        <!-- 返回按钮 -->
+        <div class="mt-8 text-center">
+            <button onclick="window.location.href='index.html'" class="px-6 py-3 rounded-lg font-medium text-lg transition-all duration-300 hover:scale-105 active:scale-95" style="background-color: #AD8B73; color: #FFFBE9; box-shadow: 0 4px 12px rgba(173, 139, 115, 0.3);">
+                返回首页
+            </button>
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-text" class="leading-relaxed pt-6"></div>
+        </div>
+    </div>
+
+    <script>
+        // 数据
+        const data = [
+            {
+    "sentence": "1.“掉到水里了会先救jm jm呢…感觉不会努力活下来”",
+    "cp": "黏",
+    "time": "东是230729，民是231226",
+    "background": "原对话：民：“我们hc尼胆子很小的，因为hc是首先自己得活下来的人”东：掉到水里了会先救jm jm呢…感觉不会努力活下来。22年的签售有人问东掉到水里了会选谁，东说选在民，但是博主没来得及问原因。当时推上年纪说可能是最近很爱在民吧/可能是因为在民讨厌下水吧，总之年纪们都觉得肯定不会是很浪漫的原因。时隔一年后，终于有人在签售上问了东河原因，东河只轻飘飘地说了一句原耽般的话”在民呢…感觉不会努力活下来。“民：Q. 因为“框！”的声音被吓醒 好像哪里发生了突发事件 认为hc会最先做的行为是?A. 感觉会穿着睡衣逃跑 我们hc尼胆子很小的 因为hc是首先自己得活下来的人",
+    "statements": [
+        "不愿意被死亡掐住喉咙的人和不愿意寻找生的希望的人。但胆小鬼也会愿意在逃跑的半路跳进水里把已经闭上眼睛的人救起，也不是一定要让你活着，只是想让你少一点痛苦。"
+    ]
+},
+{
+    "sentence": "2.“原来首尔的冬天真的会下雨”",
+    "cp": "壳",
+    "time": "2021.1.21",
+    "background": "20年两人一起直播，乐提到了冬天就算不下雪也会下雨，叽说冬天不会下雨的。两人一直在争论，乐说上海会首尔也会。21年冬天，首尔下雨了，叽在社交平台上说“原来首尔的冬天真的会下雨”。",
+    "statements": []
+},
+{
+    "sentence": "3.“看你的时候仿佛也在看着时间”",
+    "cp": "传",
+    "time": "2020.09.02",
+    "background": "",
+    "statements": [
+        "如果一个人对你说从你身上感受到时间，长大会不会是一件还算动人的好事。"
+    ]
+},
+{
+    "sentence": "4.“我的救星，我的太阳”",
+    "cp": "烁",
+    "time": "21年5月",
+    "background": "",
+    "statements": []
+},
+{
+    "sentence": "5.“我人生中的第一句韩语是我旁边这个人教的”",
+    "cp": "壳",
+    "time": "或许是2018.11.20",
+    "background": "出自虎牙双人直播",
+    "statements": [
+        "提到壳永远离不开的就是缘分二字，央视初见到练习室再见，这就是安坏关系的魅力吧。如果我能穿越时空，很想告诉两小比，你身边这个人几年后还会见面，并且你们会成为很好的亲故，想到那个表情一定很可爱。“我和js说了很多话，真的是说个不停，所以才记住了很多单词。”“js 从我会一点点韩语的时候就一直用韩语跟我说话，逐渐得的韩语提高了，所以现在我的语气和 js 很相似。”在我看来教韩语，包括教舞蹈（很多练习室都能看出两人有共同的发力点以及小动作）有点像烙印，或者称呼为关键行为阶段。缘分其实也是很薄弱的东西，彼此的性情、相遇时各自的人生阶段、各自本能的关系模式，已经决定了百分之九十的内容。但小壳从小长大走没有走散是两个人都在努力走向对方，不想放弃对方。稀里糊涂扯了一堆，总而言之请投我们小壳一票吧！"
+    ]
+},
+{
+    "sentence": "6.“我们之间的关系不需要任何东西去修饰”",
+    "cp": "壳",
+    "time": "23.4.2",
+    "background": "cl微博直播",
+    "statements": [
+        "又是巡演期间老壳长达几个钟的长谈，这次直播把科技对壳关系的认知带到了一个新高度，完全的灵魂伴侣，科技的定海神针"
+    ]
+},
+{
+    "sentence": "7.“我相信人这一生中有三次机会 非常确定的是我遇到了mk哥 在我人生中是一大转折点 然后 我能确定的是在三次机会中 有一次是跟哥一起度过的”",
+    "cp": "传",
+    "time": "23.1",
+    "background": "联联给托托留言",
+    "statements": [
+        "一开始觉得这句子没头没尾，机会为什么会用“度过”？机会是指转折点吗？后来忽然意识到，不管是什么事情，人生里三次你算一次这句话就是把对方放在非常非常重的地位上了。这段长文字的结尾是“我们以后也要一直到达我们所希望的尽头 希望以后能一边笑着一边聊这些事情”这个尽头听着真的很像txl白头偕老回头看自己当时在压抑的环境下是如何维持爱意的，别的不多说了第一句隐晦表白最后一句老托挑个假期把人带回多伦多结个婚吧"
+    ]
+},
+{
+    "sentence": "8.“从札幌开始 然后其他的全部”",
+    "cp": "壳",
+    "time": "2022.5.27",
+    "background": "js的签售repopo主问js最想和cl去日本的哪里，js写下的纯爱名言",
+    "statements": [
+        "在当时韩国一篇很有名的书《起风时，我爱你》里写了这样一句话：一起去札幌吧，那是我爱你的意思，去札幌也是小韩很有名的梗，用来表达隐晦的爱意。从我们相爱的地方开始，然后到世界上的所有地方我都想和你一起走过，直到尽头我们都不要分开吧。壳这种藏在细节里的浪漫就像札幌洁白的雪一样珍贵，叽子被封为纯爱战神的又一名言，请多多支持我们札幌吧～再附一段这位qsj的留言💧：快一年了，想到札幌还是觉得好美。白线流里男主最后一个人去了札幌天文馆，叫初山别。白线流是毕业时将男生学生帽的白线与女生水手服的领巾结成一条线静静地被流放到河水中，从小河流向大海，代表着每个人踏上新的旅程。这一生，和太多人的缘分朝生暮死脆弱如露水，唯独与你，像是一条生生不息的河流。"
+    ]
+},
+{
+    "sentence": "9.“人生简历里要是有那天就好了 2012年12月 遇见辰乐的那一天”",
+    "cp": "壳",
+    "time": "2021.1.24",
+    "background": "在地租物料，【NCT DREAM】朴志晟成人就任仪式(?)｜朴志晟！跟我到屋顶来#1 ¦ 里面，介绍朴志晟人生简历之后，朴志晟说了这句话",
+    "statements": []
+},
+{
+    "sentence": "10.“李楷灿使用注意事项:“他可能会(说我爱你/划掉)说谎。”",
+    "cp": "传",
+    "time": "231013哥组电台",
+    "background": "李马克给李楷灿写的使用注意事项",
+    "interpretLink":"https://www.douban.com/group/topic/332395063"
+},
+{
+    "sentence": "11. “谢谢，还有，我们都不要改变吧！！”",
+    "cp": "壳",
+    "time": "21年",
+    "background": "老壳给对方写信https://weibo.com/6542641477/5164556636655617",
+    "statements": [
+        "有些人用味觉来记忆，有些人用触觉来记忆，而大部分人则是最普通的那一种——触景生情。偶尔路过广安里，朴志晟会想起和钟辰乐在釜山坐缆车乘轮渡的那一天；钟辰乐在YouTube刷到最近很流行的上海vlog，会想起和很多年为了赶上那班过江轮渡在外滩奔跑时朴志晟的喘气声；朴志晟遇到新出道的后辈来打招呼，会想起刚出道的辰乐不会说韩语，只是笑眯眯地看着镜头。这些日子好像过了好久，旧的回忆被新的经历覆盖，很多事情他们逐渐记不起，或是有新的主角参与到故事中。朴志晟回到釜山和小学同学吃的汤饭依然美味，对上海的印象变成许多次签售；钟辰乐主动忘掉了自己出道时的样子，他更习惯于叫上李马克或是其他搭子打篮球，再也没耐心一遍遍从头教谁投篮。对朴志晟和钟辰乐来说，成长是一场竞赛，但在彼此身边，对方身上总是映照出自己的纯真年代。于是他们略带残忍地亲眼看着这些记忆被覆盖。改变是好事吗？候鸟从不把迁徙叫做宿命，它们只是在季风来临时率先展开翅膀。"
+    ]
+},
+{
+    "sentence": "12.“蒲公英比起花，更像棉絮的感觉。他是个很自由的人，就像可以飞去任何地方的蒲公英一般。如同随风飞行的蒲公英一样，乍一看好像是被风裹挟着走，但是会视情况随机应变的，非常贤明自由的人。所以我觉得蒲公英非常适合辰乐。”",
+    "cp": "壳",
+    "time": "24.4.1",
+    "background": "",
+    "statements": [
+        "你说爱像云，要自在漂浮才美丽"
+    ]
+},
+{
+    "sentence": "13.“天空辰、地志，辰志的这个那个，辰志的那个这个，若抬起头，有你在，若埋下头，有我在，以后的所有都仰视万物，以后的所有都俯视万物，有你在的话，天空就不再暗淡，但是偶尔会有点吵”",
+    "cp": "壳",
+    "time": "2020年",
+    "background": "",
+    "statements": []
+},
+{
+    "sentence": "14.“其实我不是那种经常会感到孤独的类型 但偶尔也会有那种时候，每当那时我就会给叽桑打电话，他每次都会接，所以经常这么聊到凌晨”“我就知道你会选我”",
+    "cp": "壳",
+    "time": "25.2.3",
+    "background": "",
+    "statements": []
+},
+{
+    "sentence": "15.“再送一次漂亮的大衣…是开玩笑的啦（笑）。我真的很想送他一首好歌。从没见过比🐬对待唱歌还认真的人，他真的能通过音乐感受到幸福，所以很想送他一首歌词优美的曲子。🐬大概会为此幸福一辈子吧。像「My youth」「ANL」「Graduation」之类的曲子就很好。是那种喜欢到如果是其他组合唱的话会嫉妒的好歌，所以想送给他这样一首完美的歌曲。”",
+    "cp": "壳",
+    "time": "2025.03",
+    "background": "原对话：问：给队友送礼物的话会送什么？🐹：再送一次漂亮的大衣…是开玩笑的啦（笑）。我真的很想送他一首好歌。从没见过比🐬对待唱歌还认真的人，他真的能通过音乐感受到幸福，所以很想送他一首歌词优美的曲子。🐬大概会为此幸福一辈子吧。像「My youth」「ANL」「Graduation」之类的曲子就很好。是那种喜欢到如果是其他组合唱的话会嫉妒的好歌，所以想送给他这样一首完美的歌曲。日本fc会刊Dreamzine Vol.5 双人采访部分，关于送礼物的问题，js再次大篇幅提到大衣（真的很在意这件大衣～），但是意外地提到想送给cl一首无与伦比的歌，但其实排版来看是想送给他俩的双人曲哦。",
+    "statements": [
+        "从js无数次赞美cl的声音撕碎了carry了，到想和cl一起cover，到想送cl送一首好歌，到直接首提lelo，再到因为看到cl在中国的舞台而想那样帅气地唱歌跳舞，深深感受到js对cl唱歌事业的欣赏和支持，以及cl对js的积极影响，相信这样良好健康的关系会走得很远。"
+    ]
+},
+{
+    "sentence": "16.“不要放弃我 不然我会受伤的”",
+    "cp": "壳",
+    "time": "21/9/4",
+    "background": "辰志的这个那个第二季一起做春卷篇，原对话“不要放弃我，我会受伤的”“好久没听你说这句话了”",
+    "statements": [
+        "这段话的含金量在于是叻叻说出来的，能让平时傲娇嘴硬的叻带着撒娇语气对叽子说出这句话，可见壳比的感情有多相互信任到能把自己内心最柔软的一面摊开给对方看，而且这句话真的太让人心动了",
+        "12年因为我们都热爱舞台所以在央视相遇，语言没有成为我们的隔阂，却成为我们命运故事中的一环。虽然你我来自不同国家，说着不同的语言，但我们可以一起坐着玩幼稚的手指游戏，命运一般我们的iPad几乎一模一样。“阿nia哈赛呦”这个穿着红色衣服有点像小鸡仔一样的小男孩，正在教我人生中的第一句韩语。“啊我还能遇到当时那个韩国朋友吗”仁川机场人山人海，周围刺耳的韩语像潮水一样向我涌来，我磕磕绊绊只能说出那句当时你教给我的“阿nia哈赛呦”，心里开始想我还会遇到当时那个教我这句话的你吗。“呀 我觉得你真的非常太帅了”“谢谢”刚开始我的练习生活，这个韩国人很主动的找我搭话，展示着他的中文。说实话说的还可以？不会韩语的我也憨憨笑着。“You are my destiny～”原来叽桑就是当初那个教我韩语的小子啊，下飞机的念叨竟然成真了，我们竟然真的又相遇了，不可思议。“各位各位，我和辰乐哥决定成为亲故了”“阿拉嗖”我告诉叽桑可以不用叫我哥哥的，叽桑说我是他的第一个朋友😏，你也是我的第一个韩国朋友啊叽桑。“我现在想想 他完全不是一个有耐心的人 但他竟然有耐心和我去说明”叽桑教我韩语的时候很耐心 会纠正我语法用词的错误 也会告诉我不好的话不要学。“最喜欢的韩文单词：지성”这个问题出来的时候叽桑在我旁边说了一句叽桑，虽然很想逗他 但确实是叽桑呢 还是不逗他了。是叽桑我的韩文变得好了，是叽桑一直陪着我玩闹，是叽桑一直陪我聊天。我想最喜欢的韩文单词肯定是지성！“不要放弃我 我会受伤的”“好久没听你说这句话了”会在什么处境下说出这句话呢，可能是在韩语课上因为老师的批评而受挫的我，想要学好韩语经常和你聊天，所以希望你不要放弃我。也可能是看着镜子里像机器一样跳着舞的我，和旁边把动作拆解开嘴里喊着one two three four 教我动作，不要放弃我吧叽桑。2012-2025，从北京到首尔的命运故事还在继续书写。你妈妈上次告诉我“我们辰乐韩语说的比叽桑还好了呢”happy happy happy～还好当时你没放弃我 呀 帕鸡桑 以后有不会的韩国语来请教请教我吧😏"
+    ]
+},
+{
+    "sentence": "17.“我 以前就见过你。”",
+    "cp": "壳",
+    "time": "2023.3.22",
+    "background": "粉丝签售问🐹的问题 💚：如果现在的你穿越回10年前第一次见到🐬那天，你会想要对当时的他说什么？🐹：",
+    "statements": [
+        "朴宝玉🥹🥹"
+    ]
+},
+{
+    "sentence": "18.“不要像上次一样哭着打电话说想我”",
+    "cp": "壳",
+    "time": "2020.10",
+    "background": "辰乐的随心所欲第二期快要结束时，牢记要走了，想逗逗老了，说下的这句tmi/如辰乐所愿里的tmi，具体背景暂且不知，但20年的时候是乐在🇰🇷比较念家孤独的一段时间，所以和这方面也可能有关",
+    "statements": [
+        "各位！钟辰乐哭着打电话说想朴志晟啊！钟辰乐啊！那是钟辰乐哭着打电话！不是朴志晟哭着打电话啊！今年也有tmi说老了会在孤独的时候给老叽打电话 老叽每次都会接…投我打电话一票吧！",
+        "老了是个很t的人，他自己也这样形容自己是一个没有眼泪的机器，眼泪对他来说是很稀有的，也是在可能很受不住的情况下才会出现，而老了会打电话给牢记说这句话，所以我觉得老了潜意识的第一个想到牢记，也是觉得他是最亲近的人，想把不好的情绪托付给他"
+    ]
+},
+{
+    "sentence": "19.“虽然每天见面可是你都好久没陪我玩了”",
+    "cp": "笃",
+    "time": "21年前",
+    "background": "少年意志训练营",
+    "statements": [],
+    "interpretLink":"https://www.douban.com/group/topic/332377536"
+},
+{
+    "sentence": "20.“喜欢楷灿，还是喜欢东赫”",
+    "cp": "传",
+    "time": "25.7.21",
+    "background": "Dream vs Dream 2025",
+    "statements": [
+        "时隔七年的梦对梦，当日常已经融化于血肉，彼此的讨厌和喜欢已经变成了习惯，变成争执要不要去吃血肠汤的一个个午后。日常和非日常的界限在哪里，本心与表演的界限在哪里，东赫和楷灿的界限又在哪里。又或者说，因为无论在界限的哪一边，我们都彼此见证，所以界限从来都不存在。我了解的，从来都是一体两面的你。"
+    ]
+}
+        ]        // 截断文本函数
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // 显示模态框
+        function showModal(title, content) {
+            const modal = document.getElementById('modal');
+            const modalText = document.getElementById('modal-text');
+            modalText.innerHTML = `<h3 class="font-semibold mb-3 text-lg">${title}</h3><p class="text-base">${content}</p>`;
+            modal.style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // 创建卡片
+        function createCard(item, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${index}`;
+
+            // 正面
+            const frontFace = document.createElement('div');
+            frontFace.className = 'card-face card-front flex items-center justify-center p-6';
+            frontFace.innerHTML = `
+                <div class="text-center w-full">
+                    <p class="text-lg font-medium leading-relaxed">${item.sentence}</p>
+                </div>
+            `;
+
+            // 反面
+            const backFace = document.createElement('div');
+            backFace.className = 'card-face card-back px-6 py-4 flex flex-col';
+            
+            let backContent = `
+                <div class="text-center mb-4">
+                    <p class="text-lg font-medium mb-3 leading-relaxed">${item.sentence}</p>
+                    <p class="text-base opacity-90">${item.cp}</p>
+                </div>
+                <div class="divider"></div>
+                <div class="flex-1 overflow-auto">
+                    <div class="text-left text-sm space-y-2">
+                        <p class="opacity-80 font-medium">${item.time}</p>
+            `;
+
+            // 添加 background（如果存在且不为空）
+            if (item.background && item.background.trim()) {
+                backContent += `
+                    <p class="opacity-90">
+                        <span class="font-medium">背景：</span>
+                        <span class="clickable-text" onclick="showModal('背景故事', '${item.background.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                            ...
+                        </span>
+                    </p>
+                `;
+            }
+
+            // 添加 statements（如果存在且不为空）
+            if (item.statements && item.statements.length > 0) {
+                item.statements.forEach((statement, idx) => {
+                    backContent += `
+                        <p class="opacity-90">
+                            <span class="font-medium">个人解读：</span>
+                            <span class="clickable-text" onclick="showModal('个人解读 ${idx + 1}', '${statement.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}')">
+                                ...
+                            </span>
+                        </p>
+                    `;
+                });
+            }
+            // 如果 interpretLink 存在，就插入一个“解读链接”行
+            if (item.interpretLink) {
+            backContent += `
+                <p class="opacity-90 mt-2">
+                <span class="font-medium">解读链接：</span>
+                <a 
+                    href="${item.interpretLink}" 
+                    target="_blank" 
+                    class="text-blue-200 underline hover:text-blue-100"
+                >
+                    ${item.interpretLinkText || item.interpretLink}
+                </a>
+                </p>
+            `;
+            }
+
+            backContent += `
+                    </div>
+                </div>
+            `;
+
+            backFace.innerHTML = backContent;
+
+            // 组装卡片
+            card.appendChild(frontFace);
+            card.appendChild(backFace);
+            cardContainer.appendChild(card);
+
+            // 添加点击事件
+            card.addEventListener('click', function(e) {
+                // 阻止点击可点击文本时触发翻转
+                if (e.target.classList.contains('clickable-text')) {
+                    return;
+                }
+                card.classList.toggle('flipped');
+            });
+
+            return cardContainer;
+        }
+
+        // 初始化页面
+        function init() {
+            const container = document.getElementById('cards-container');
+            data.forEach((item, index) => {
+                const card = createCard(item, index);
+                container.appendChild(card);
+            });
+        }
+
+        // 模态框事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            // 关闭模态框事件
+            const modal = document.getElementById('modal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn.onclick = closeModal;
+            
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        });
+    </script>
+</body>
+</html>
